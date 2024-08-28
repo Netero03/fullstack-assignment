@@ -1,56 +1,58 @@
 import React, { useState, useEffect } from 'react';
 
-const backendApiUrl = import.meta.env.VITE_BACKEND_API_URL
+const backendApiUrl = import.meta.env.VITE_BACKEND_API_URL; // Load the backend API URL from environment variables
 
 const HelpCenter = () => {
-    const [cards, setCards] = useState([]);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [error, setError] = useState(null);
-    const [showPopup, setShowPopup] = useState(false);
-    const [newCard, setNewCard] = useState({ title: '', description: '' });
+    const [cards, setCards] = useState([]); // State to store the list of help center cards
+    const [searchQuery, setSearchQuery] = useState(''); // State to store the user's search query
+    const [error, setError] = useState(null); // State to store any error messages
+    const [showPopup, setShowPopup] = useState(false); // State to control the visibility of the card creation popup
+    const [newCard, setNewCard] = useState({ title: '', description: '' }); // State to store the new card details
 
     useEffect(() => {
-        fetchCards();
+        fetchCards(); // Fetch cards when the component mounts
     }, []);
 
     const fetchCards = async () => {
+        // Function to fetch help center cards from the backend API
         try {
             const response = await fetch(`${backendApiUrl}/cards`);
             if (!response.ok) {
-                throw new Error('Failed to fetch cards');
+                throw new Error('Failed to fetch cards'); // Handle response errors
             }
-            const data = await response.json();
-            setCards(data);
+            const data = await response.json(); // Parse the response JSON
+            setCards(data); // Update the cards state with the fetched data
         } catch (error) {
-            setError(error.message);
+            setError(error.message); // Set error message in case of failure
         }
     };
 
     const handleSearchChange = (e) => {
-        setSearchQuery(e.target.value);
+        setSearchQuery(e.target.value); // Update search query state as the user types
     };
 
     const filteredCards = cards.filter(card =>
-        card.title.toLowerCase().includes(searchQuery.toLowerCase())
+        card.title.toLowerCase().includes(searchQuery.toLowerCase()) // Filter cards based on the search query
     );
 
     const handleCreateCard = async () => {
+        // Function to handle creating a new card
         try {
             const response = await fetch(`${backendApiUrl}/cards`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(newCard),
+                body: JSON.stringify(newCard), // Send new card data to the backend
             });
             if (!response.ok) {
-                throw new Error('Failed to create card');
+                throw new Error('Failed to create card'); // Handle response errors
             }
-            fetchCards(); // Refresh the cards list
+            fetchCards(); // Refresh the cards list after creation
             setNewCard({ title: '', description: '' }); // Clear the input fields
-            setShowPopup(false); // Close the popup
+            setShowPopup(false); // Close the card creation popup
         } catch (error) {
-            setError(error.message);
+            setError(error.message); // Set error message in case of failure
         }
     };
 
@@ -68,17 +70,17 @@ const HelpCenter = () => {
                         className='w-full md:w-[700px] h-16 bg-white border border-black hover:border-[#4c5fd6] text-black rounded text-xl p-4 transition-all duration-300'
                         placeholder='Search'
                         value={searchQuery}
-                        onChange={handleSearchChange}
+                        onChange={handleSearchChange} // Handle changes to the search input
                     />
                 </div>
                 <button
-                    onClick={() => setShowPopup(true)}
+                    onClick={() => setShowPopup(true)} // Show the card creation popup when clicked
                     className='absolute hover:font-light right-5 bottom-5 border border-white rounded-lg bg-zinc-900 hover:bg-[#5c71ff] hover:text-black p-2 px-4 text-lg md:text-2xl flex items-center text-center transition-all duration-300'>
                     Create Card
                 </button>
             </div>
             <div className='relative flex flex-col items-center text-center p-10 md:p-20'>
-                {error && <p className='absolute top-5 text-red-500 w-full h-20 text-center'>{error}</p>}
+                {error && <p className='absolute top-5 text-red-500 w-full h-20 text-center'>{error}</p>} {/* Display error messages */}
                 <div className='text-black flex flex-wrap gap-10 md:gap-20 w-full md:px-32 items-center justify-center '>
                     {filteredCards.map(card => (
                         <div key={card._id} className='md:w-[500px] md:h-[200px] border rounded-2xl bg-[#f4f6f8] border-gray-300 text-left'>
@@ -86,7 +88,7 @@ const HelpCenter = () => {
                             <div className='w-full h-px bg-gray-300'></div>
                             <p className='pt-1 px-6 pb-1 text-[#3e4142] text-2xl'>{card.description}</p>
                         </div>
-                    ))}
+                    ))} {/* Render filtered cards */}
                 </div>
             </div>
             {showPopup && (
@@ -97,21 +99,21 @@ const HelpCenter = () => {
                             className='w-full p-2 border mb-4 rounded'
                             placeholder='Title'
                             value={newCard.title}
-                            onChange={(e) => setNewCard({ ...newCard, title: e.target.value })}
+                            onChange={(e) => setNewCard({ ...newCard, title: e.target.value })} // Update title in new card state
                         />
                         <textarea
                             className='w-full p-2 border mb-4 rounded'
                             placeholder='Description'
                             value={newCard.description}
-                            onChange={(e) => setNewCard({ ...newCard, description: e.target.value })}
+                            onChange={(e) => setNewCard({ ...newCard, description: e.target.value })} // Update description in new card state
                         />
                         <button
-                            onClick={handleCreateCard}
-                            className='bg-blue-500 hover:bg-blue-800 text-white p-2 rounded transition-all duration-300'>
+                            onClick={handleCreateCard} // Trigger the card creation process
+                            className='bg-[#4c5fd4] hover:bg-blue-800 text-white p-2 rounded transition-all duration-300'>
                             Create
                         </button>
                         <button
-                            onClick={() => setShowPopup(false)}
+                            onClick={() => setShowPopup(false)} // Close the popup without creating a card
                             className='ml-2 bg-gray-500 hover:bg-gray-800 text-white p-2 rounded transition-all duration-300'>
                             Cancel
                         </button>

@@ -5,12 +5,14 @@ import { HelpCenter, NotFound } from './pages';
 function App() {
   return (
     <Router>
-      <Header/>
+      <Header />{/* Header on every page */}
+
       <Routes>
         <Route path="/" element={<HelpCenter />} />
         <Route path="*" element={<NotFound />} /> {/* 404 Route */}
       </Routes>
-      <Footer />
+      
+      <Footer />{/* Footer on every page */}
     </Router>
   );
 }
